@@ -42,6 +42,7 @@ function printTweets() {
 function printSpotifyResults() {
 
 	console.log("running code");
+	console.log("................")
 
 
 	spotify.search({ type: 'track', query: trackName }, function(err, data) {
@@ -50,10 +51,13 @@ function printSpotifyResults() {
         return;
     }
 
+    //logs the results 
+    console.log("YOUR SEARCH RESULTS:")
  	for (results in data.tracks.items) {
  	console.log("________________________________________________________________________________________")
     console.log("ARTIST:  " + data.tracks.items[results].artists[0].name);
     console.log("SONG:  " + data.tracks.items[results].name);
+    console.log("ALBUM:  " + data.tracks.items[results].album.name + "  (" + data.tracks.items[results].album.album_type + ")");
     console.log("PREVIEW:  " + data.tracks.items[results].preview_url);
     console.log("________________________________________________________________________________________")
 }
