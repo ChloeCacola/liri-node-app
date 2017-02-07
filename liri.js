@@ -1,3 +1,105 @@
+//list the requirements
+//includes the keys from the keys.js file
+var keys = require("./keys.js");
+var spotify = require("spotify");
+
+//command for node
+var command = process.argv[2];
+var trackName = process.argv[3];
+
+//store twitterKeys from keys.js file inside a variable for ease of use
+var getTweets = keys.twitterKeys;
+
+
+
+//print user's tweets with a function
+function printTweets() {
+	//retrieve user tweets!
+	getTweets.get('statuses/user_timeline', function(error, tweets, response) {
+
+	  if(error) {
+	  	console.log(error);
+	  }
+
+	  //for (i=0, i<=20, i++); >>to print out 20 tweets?
+
+	  //log out the most recent tweets by looping through the tweets object
+	  for (myTweets in tweets) {
+	  	console.log("___________________________________________________________________________")
+	  	console.log(tweets[myTweets].created_at)
+	  	console.log(tweets[myTweets].text)
+	  	console.log("___________________________________________________________________________")
+
+	  }
+	  // console.log(tweets[0].text);  // The favorites. 
+	  // console.log(response);  // Raw response object. 
+	});
+
+}
+
+
+//print spotify search results with a function
+function printSpotifyResults() {
+
+	console.log("running code");
+
+
+	spotify.search({ type: 'track', query: trackName }, function(err, data) {
+    if ( err ) {
+        console.log('Error occurred: ' + err);
+        return;
+    }
+
+ 	for (results in data.tracks.items) {
+ 	console.log("________________________________________________________________________________________")
+    console.log("ARTIST:  " + data.tracks.items[results].artists[0].name);
+    console.log("SONG:  " + data.tracks.items[results].name);
+    console.log("PREVIEW:  " + data.tracks.items[results].preview_url);
+    console.log("________________________________________________________________________________________")
+}
+});
+}
+
+//Use specified functions based on which command is being used
+switch (command) {
+
+	case "my-tweets":
+
+		printTweets();
+
+		break;
+
+	case "spotify-this-song":
+
+		//if track name not provided, the sign by ace of base is searched for.
+		if(trackName === undefined) {
+		trackName = 'the sign ace of base';
+		printSpotifyResults();
+
+		}
+
+		else {
+		//spotify this song function here
+		printSpotifyResults()
+
+		}
+
+	case "movie-this":
+		
+		//movie this function here
+
+		break;
+
+	case "do-what-it-says":
+
+		//do what says function here
+
+		break;
+
+	default:
+	 	console.log("Sorry, that's not a known command.");
+
+}
 //write code needed to grab the data from keys.js.  Store the keys in a variable
 //make it so liri.js can take in one of the following commands 
 		//'my-tweets'
@@ -9,7 +111,8 @@
 			/*Explained:
 				MY TWEETS:  Will show last 20 tweets and when they were created at in your terminal/bash window
 
-				SPOTIFY: Will show *Artist(s) 
+				SPOTIFY: Will show 
+					*Artist(s) 
 					*Song name 
 					*Preview link of song from spotify 
 					* Album song is from  
@@ -39,3 +142,4 @@
 		Make sure you append each command you run to the log.txt file. 
 		Do not overwrite your file each time you run a command.
 	*/
+	
