@@ -6,10 +6,15 @@ var spotify = require("spotify");
 //command for node
 var command = process.argv[2];
 var trackName = process.argv[3];
+var movieTitle
 
 //store twitterKeys from keys.js file inside a variable for ease of use
 var getTweets = keys.twitterKeys;
 
+
+
+
+//THE FUNCTIONS//
 
 
 //print user's tweets with a function
@@ -21,7 +26,6 @@ function printTweets() {
 	  	console.log(error);
 	  }
 
-	  //for (i=0, i<=20, i++); >>to print out 20 tweets?
 
 	  //log out the most recent tweets by looping through the tweets object
 	  for (myTweets in tweets) {
@@ -64,6 +68,70 @@ function printSpotifyResults() {
 });
 }
 
+
+//print movie results
+function printMovieResults() {
+
+	var request = require('request');
+
+	movieTitle = process.argv[3];
+
+	var options = {
+		url: "http://www.omdbapi.com/?t=" + movieTitle + "&y=&plot=short&r=json",
+		headers: {
+			'User-Agent': 'request'
+		}
+	}
+
+	//run the request module on a URL with a JSON
+	request(options, function (error, response, body) {
+
+	//if there were no errors and the response code was 200(i.e. the request was successful)..
+	if(!error && response.statusCode === 200) {
+
+		//converting it to an object by using JSON parse
+		console.log(JSON.parse(body).imdbRating);
+	} else {
+		console.log(error);
+	}
+});
+
+}
+
+
+//do what the text document says to do..
+function doWhatItSays() {
+
+	//require fs package to read random file
+	var fs = require("fs");
+
+	//read random text file
+	fs.readFile("random.txt", "utf8", function(error, data) {
+
+		//split array into parts at the commas
+		var dataArr = data.split(",");
+		console.log(dataArr);
+		
+		//first item in array becomes command
+		//second item in array becomes the track name being searched for or movie title.
+		command=dataArr[0];
+		trackName = dataArr[1];
+		movieTitle = dataArr[1];
+		carryOutCommands();
+
+	})
+
+}
+
+
+
+
+
+
+
+//THE COMMANDS TO BE USED//
+
+function carryOutCommands() {
 //Use specified functions based on which command is being used
 switch (command) {
 
@@ -80,10 +148,11 @@ switch (command) {
 		trackName = 'the sign ace of base';
 		printSpotifyResults();
 
+
 		}
 
 		else {
-		//spotify this song function here
+		//spotify the song
 		printSpotifyResults()
 
 		}
@@ -91,19 +160,28 @@ switch (command) {
 	case "movie-this":
 		
 		//movie this function here
-
-		break;
-
-	case "do-what-it-says":
-
-		//do what says function here
+		printMovieResults();
 
 		break;
 
 	default:
 	 	console.log("Sorry, that's not a known command.");
-
 }
+}
+
+if (command === "do-what-it-says") {
+	console.log("yes");
+		//do what says function here
+		doWhatItSays();
+
+	} 
+else if (command === "spotify-this-song" || command === "movie-this" || command === "my-tweets") {
+	carryOutCommands();
+} 
+else {
+	 	console.log("Sorry, that's not a known command.");
+}
+
 //write code needed to grab the data from keys.js.  Store the keys in a variable
 //make it so liri.js can take in one of the following commands 
 		//'my-tweets'
