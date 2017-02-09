@@ -5,8 +5,6 @@ var spotify = require("spotify");
 
 //command for node
 var command = process.argv[2];
-var trackName = process.argv[3];
-var movieTitle
 
 //store twitterKeys from keys.js file inside a variable for ease of use
 var getTweets = keys.twitterKeys;
@@ -48,6 +46,12 @@ function printSpotifyResults() {
 	console.log("running code");
 	console.log("................")
 
+	var trackName = process.argv[3];
+
+	if(trackName === undefined) {
+		trackName = 'the sign ace of base';
+	}
+
 
 	spotify.search({ type: 'track', query: trackName }, function(err, data) {
     if ( err ) {
@@ -72,12 +76,23 @@ function printSpotifyResults() {
 //print movie results
 function printMovieResults() {
 
+	console.log("running code")
+	console.log("............")
+
+	//require request package
 	var request = require('request');
 
-	movieTitle = process.argv[3];
+	//store user input in a variable
+	var movieTitle = process.argv[3];
+
+	//if there is no movie title entered, make it "Mr. Nobody"
+	if(movieTitle === undefined) {
+		movieTitle = 'Mr. Nobody';
+	}
+
 
 	var options = {
-		url: "http://www.omdbapi.com/?t=" + movieTitle + "&y=&plot=short&r=json",
+		url: "http://www.omdbapi.com/?t=" + movieTitle + "&y=&plot=short&tomatoes=true&r=json",
 		headers: {
 			'User-Agent': 'request'
 		}
@@ -86,17 +101,31 @@ function printMovieResults() {
 	//run the request module on a URL with a JSON
 	request(options, function (error, response, body) {
 
+
 	//if there were no errors and the response code was 200(i.e. the request was successful)..
 	if(!error && response.statusCode === 200) {
 
-		//converting it to an object by using JSON parse
-		console.log(JSON.parse(body).imdbRating);
+		//converting to JSON object and then choosing properties to print the value in console
+		title = JSON.parse(body).Title;
+		year = JSON.parse(body).Year;
+		console.log("__________________________________")
+		console.log(title.toUpperCase() + " (" + year + ")");
+		console.log("Country:  " + JSON.parse(body).Country);
+		console.log("Language:  " + JSON.parse(body).Language);
+		console.log("Actors:  " + JSON.parse(body).Actors);
+		console.log("---PLOT-------------------------------------------------------------------------------")
+		console.log(JSON.parse(body).Plot);
+		console.log("--------------------------------------------------------------------------------------")
+		console.log("IMDB rating:  " + JSON.parse(body).imdbRating);
+		console.log("Rotten Tomatoes Rating:  " + JSON.parse(body).tomatoRating);
+		console.log("Rotten Tomatoes URL:  " + JSON.parse(body).tomatoURL);
 	} else {
 		console.log(error);
 	}
 });
 
 }
+
 
 
 //do what the text document says to do..
@@ -117,6 +146,8 @@ function doWhatItSays() {
 		command=dataArr[0];
 		trackName = dataArr[1];
 		movieTitle = dataArr[1];
+
+		//follow through with other commands in order to run the text as those commands
 		carryOutCommands();
 
 	})
@@ -129,48 +160,46 @@ function doWhatItSays() {
 
 
 
-//THE COMMANDS TO BE USED//
+//THE COMMANDS TO BE USED (INSIDE A COMMAND!)//
 
 function carryOutCommands() {
 //Use specified functions based on which command is being used
 switch (command) {
 
+	//if my-tweets is in process.argv[2]...
 	case "my-tweets":
 
+		//print the tweets
 		printTweets();
 
 		break;
 
+	//if spotify-this-song is in process.argv[2]...
 	case "spotify-this-song":
 
-		//if track name not provided, the sign by ace of base is searched for.
-		if(trackName === undefined) {
-		trackName = 'the sign ace of base';
-		printSpotifyResults();
-
-
-		}
-
-		else {
 		//spotify the song
 		printSpotifyResults()
 
-		}
+		break;
 
+	//if movie-this is in process.argv[2]...
 	case "movie-this":
 		
-		//movie this function here
+		//access omdb api and print those results
 		printMovieResults();
 
 		break;
 
+	//if there is not a valid command entered
 	default:
 	 	console.log("Sorry, that's not a known command.");
 }
 }
 
+
+//Properly matching commands to their functions in a specific order so that do-what-it-says works appropriately
 if (command === "do-what-it-says") {
-	console.log("yes");
+	
 		//do what says function here
 		doWhatItSays();
 
@@ -182,41 +211,36 @@ else {
 	 	console.log("Sorry, that's not a known command.");
 }
 
-//write code needed to grab the data from keys.js.  Store the keys in a variable
-//make it so liri.js can take in one of the following commands 
-		//'my-tweets'
-		//'spotify-this-song'
-		//'movie-this'
-		//'do-what-it-says'
+//append the data 
+// var fs = require("fs");
+
+// fs.readFile('MINGW64:/', function(error, data) {
+// 	if (error) {
+// 		console.log(error);
+
+// 	}
+// 	else {
+
+// fs.appendFile('log.txt', data, function(err) {
+
+// 	//if error experienced, log it
+// 	if (err) {
+// 		console.log(err);
+// 	}
+
+// 	//if no error, log content added
+// 	else {
+// 		console.log("Content Added!");
+
+// 	}
+
+// 	});
+// }
+
+// });
 
 
-			/*Explained:
-				MY TWEETS:  Will show last 20 tweets and when they were created at in your terminal/bash window
 
-				SPOTIFY: Will show 
-					*Artist(s) 
-					*Song name 
-					*Preview link of song from spotify 
-					* Album song is from  
-				in window/terminal Bash 
-				**If no song is provided then the program will default to "The Sign" by Ace of Base.  
-
-				MOVIE THIS: Will output 
-					*Title of movie 
-					*Year movie came out
-					*IMDB rating of movie
-					*Country where movie was produced
-					*Language of the movie
-					*Plot of the movie
-					*Actors in the movie
-					*Rotten tomatoes rating
-					*rotton tomatoes URL
-				in window/terminal bash
-				**If user doesn't type a movie in, program will output data for the movie "Mr. Nobody"
-
-				DO WHAT IT SAYS: Using the fs Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands. 
-					*Should run spotify-this-song for "I Want it That Way" as follows the text in random.txt
-					*Can change the text in that document to test out feature for other commands */
 
 
 	/*BONUSES
