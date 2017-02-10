@@ -5,6 +5,8 @@ var spotify = require("spotify");
 
 //command for node
 var command = process.argv[2];
+var movieTitle = process.argv[3];
+var trackName = process.argv[3];
 
 //store twitterKeys from keys.js file inside a variable for ease of use
 var getTweets = keys.twitterKeys;
@@ -46,7 +48,6 @@ function printSpotifyResults() {
 	console.log("running code");
 	console.log("................")
 
-	var trackName = process.argv[3];
 
 	if(trackName === undefined) {
 		trackName = 'the sign ace of base';
@@ -82,8 +83,6 @@ function printMovieResults() {
 	//require request package
 	var request = require('request');
 
-	//store user input in a variable
-	var movieTitle = process.argv[3];
 
 	//if there is no movie title entered, make it "Mr. Nobody"
 	if(movieTitle === undefined) {
@@ -120,7 +119,7 @@ function printMovieResults() {
 		console.log("Rotten Tomatoes Rating:  " + JSON.parse(body).tomatoRating);
 		console.log("Rotten Tomatoes URL:  " + JSON.parse(body).tomatoURL);
 	} else {
-		console.log(error);
+		console.log(response.statusCode);
 	}
 });
 
@@ -140,17 +139,20 @@ function doWhatItSays() {
 		//split array into parts at the commas
 		var dataArr = data.split(",");
 		console.log(dataArr);
+
 		
 		//first item in array becomes command
 		//second item in array becomes the track name being searched for or movie title.
-		command=dataArr[0];
+		command = dataArr[0];
 		trackName = dataArr[1];
 		movieTitle = dataArr[1];
+	
+
 
 		//follow through with other commands in order to run the text as those commands
 		carryOutCommands();
 
-	})
+	});
 
 }
 
@@ -176,7 +178,7 @@ switch (command) {
 
 	//if spotify-this-song is in process.argv[2]...
 	case "spotify-this-song":
-
+		console.log(trackName);
 		//spotify the song
 		printSpotifyResults()
 
